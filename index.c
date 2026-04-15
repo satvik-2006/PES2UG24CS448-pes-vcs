@@ -232,6 +232,7 @@ int index_add(Index *index, const char *path) {
 
     free(data);
 
+/* Update existing staged entry or append a new one */
     IndexEntry *entry = index_find(index, path);
     if (!entry) {
         if (index->count >= MAX_INDEX_ENTRIES) return -1;
