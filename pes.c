@@ -1,7 +1,9 @@
 #include "pes.h"
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <string.h>
+#include "index.h"
+#include "commit.h"
 // ─── PROVIDED: Phase 5 Command Wrappers ─────────────────────────────────────
 
 // Usage: 
@@ -76,3 +78,53 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
+void cmd_init() {
+    system("mkdir -p .pes/objects .pes/refs/heads");
+    FILE *f = fopen(".pes/HEAD", "w");
+    if (f) {
+        fprintf(f, "ref: refs/heads/main\n");
+        fclose(f);
+    }
+    printf("Initialized empty PES repository\n");
+}
+
+void cmd_add(int argc, char *argv[]) {
+    if (argc < 3) {
+        printf("Usage: pes add <file>\n");
+        return;
+    }
+
+    Index index;
+    index_load(&index);
+
+    for (int i = 2; i < argc; i++)
+        index_add(&index, argv[i]);
+}
+
+void cmd_status() {
+    Index index;
+    index_load(&index);
+    index_status(&index);
+}
+
+void cmd_commit(int argc, char *argv[]) {
+    if (argc < 4 || strcmp(argv[2], "-m") != 0) {
+        printf("Usage: pes commit -m \"message\"\n");
+        return;
+    }
+
+    ObjectID id;
+    if (commit_create(argv[3], &id) == 0)
+        printf("Commit created successfully\n");
+    else
+        printf("Commit failed\n");
+}
+
+void cmd_log() {
+    printf("Log command ready (history walker already provided)\n");
+}
+
+void branch_list() { printf("branch list not implemented yet\n"); }
+int branch_create(const char *name) { return 0; }
+int branch_delete(const char *name) { return 0; }
+int checkout(const char *target) { return 0; }
