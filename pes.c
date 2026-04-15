@@ -120,8 +120,18 @@ void cmd_commit(int argc, char *argv[]) {
         printf("Commit failed\n");
 }
 
+void show_commit(const ObjectID *id, const Commit *commit, void *ctx) {
+    char hex[HASH_HEX_SIZE + 1];
+    hash_to_hex(id, hex);
+
+    printf("commit %s\n", hex);
+    printf("Author: %s\n", commit->author);
+    printf("Time: %lu\n", commit->timestamp);
+    printf("Message: %s\n\n", commit->message);
+}
+
 void cmd_log() {
-    printf("Log command ready (history walker already provided)\n");
+    commit_walk(show_commit, NULL);
 }
 
 void branch_list() { printf("branch list not implemented yet\n"); }
