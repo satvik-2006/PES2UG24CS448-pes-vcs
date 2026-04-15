@@ -134,24 +134,8 @@ int tree_serialize(const Tree *tree, void **data_out, size_t *len_out) {
 /* Build root tree from staged index entries and store as tree object */
 
 int tree_from_index(ObjectID *id_out) {
-    Index index;
-    if (index_load(&index) != 0) return -1;
-
     Tree tree;
     tree.count = 0;
-
-    for (int i = 0; i < index.count; i++) {
-        TreeEntry *entry = &tree.entries[tree.count++];
-
-        entry->mode = index.entries[i].mode;
-        entry->hash = index.entries[i].hash;
-
-        const char *name = strrchr(index.entries[i].path, '/');
-        if (name)
-            strcpy(entry->name, name + 1);
-        else
-            strcpy(entry->name, index.entries[i].path);
-    }
 
     void *data;
     size_t len;
