@@ -104,15 +104,15 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
 
     size_t total_len = header_len + len;
     unsigned char *object_buf = malloc(total_len);
-    if (!buffer) return -1;
+    if (!object_buf) return -1;
 
-    memcpy(buffer, header, header_len);
-    memcpy(buffer + header_len, data, len);
+    memcpy(object_buf, header, header_len);
+    memcpy(object_buf + header_len, data, len);
 
-    compute_hash(buffer, total_len, id_out);
+    compute_hash(object_buf, total_len, id_out);
 
     if (object_exists(id_out)) {
-        free(buffer);
+        free(object_buf);
         return 0;
     }
 
@@ -129,17 +129,17 @@ int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out
 
     int fd = open(temp, O_CREAT | O_WRONLY | O_TRUNC, 0644);
     if (fd < 0) {
-        free(buffer);
+        free(object_buf);
         return -1;
     }
 
-    write(fd, buffer, total_len);
+    write(fd, object_buf, total_len);
     fsync(fd);
     close(fd);
 
     rename(temp, path);
 
-    free(buffer);
+    free(object_buf);
     return 0;
 }
 // Read an object from the store.
