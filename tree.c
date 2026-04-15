@@ -131,7 +131,7 @@ int tree_serialize(const Tree *tree, void **data_out, size_t *len_out) {
 //   - object_write    : save that binary buffer to the store as OBJ_TREE
 //
 // Returns 0 on success, -1 on error.
-/* Build root tree from staged index entries and store as tree object */
+/* Creates and stores the root tree object for the staged snapshot */
 
 int tree_from_index(ObjectID *id_out) {
     Tree tree;
