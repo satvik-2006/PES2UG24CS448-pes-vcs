@@ -188,7 +188,7 @@ int object_read(const ObjectID *id, ObjectType *type_out, void **data_out, size_
 
     ObjectID check;
     compute_hash(buffer, file_size, &check);
-
+/* Verify stored object was not corrupted */
     if (memcmp(check.hash, id->hash, HASH_SIZE) != 0) {
         free(buffer);
         return -1;
