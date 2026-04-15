@@ -25,6 +25,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+int tree_from_index(ObjectID *id_out);
+int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out);
+
 // Forward declarations (implemented in object.c)
 int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out);
 int object_read(const ObjectID *id, ObjectType *type_out, void **data_out, size_t *len_out);
@@ -196,8 +199,37 @@ int head_update(const ObjectID *new_commit) {
 /* Create a commit from the current staged snapshot and update HEAD */
 
 int commit_create(const char *message, ObjectID *commit_id_out) {
-    // TODO: Implement commit creation
-    // (See Lab Appendix for logical steps)
-    (void)message; (void)commit_id_out;
-    return -1;
+    Commit commit;
+    memset(&commit, 0, sizeof(commit));
+
+    if (tree_from_index(&commit.tree) != 0)
+        return -1;
+
+    if (head_read(&commit.parent) == 0)
+        commit.has_parent = 1;
+    else
+        commit.has_parent = 0;
+
+    const char *author = getenv("PES_AUTHOR");
+    if (!author) author = "Unknown Author";
+
+    strncpy(commit.author, author, sizeof(commit.author) - 1);
+    strncpy(commit.message, message, sizeof(commit.message) - 1);
+
+    commit.timestamp = (uint64_t)time(NULL);
+
+    void *data;
+    size_t len;
+
+    if (commit_serialize(&commit, &data, &len) != 0)
+        return -1;
+
+    if (object_write(OBJ_COMMIT, data, len, commit_id_out) != 0) {
+        free(data);
+        return -1;
+    }
+
+    free(data);
+
+    return head_update(commit_id_out);
 }
