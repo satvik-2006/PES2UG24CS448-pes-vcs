@@ -91,6 +91,7 @@ int object_exists(const ObjectID *id) {
 
 //
 // Returns 0 on success, -1 on error.
+/* Writes header + data, hashes full object, stores atomically */
 int object_write(ObjectType type, const void *data, size_t len, ObjectID *id_out) {
     char type_str[10];
 
